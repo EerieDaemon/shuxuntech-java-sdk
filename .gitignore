@@ -32,6 +32,8 @@ Thumbs.db
 # Local build cache used when ~/.m2 is not writable
 .mvnrepo/
 .mvn/settings-local.xml
+.mvn/settings-verify.xml
+.verify-consumer/
 
 # Logs & local files
 *.log
