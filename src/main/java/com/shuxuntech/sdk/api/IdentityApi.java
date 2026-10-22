@@ -49,17 +49,7 @@ public final class IdentityApi {
             .put("idCard", idCard)
             .put("image", image)
             .put("imgUrl", imgUrl);
-        return client.post("/v1/faceIdCard/check/yisuo", request, FaceIdCardResult.class);
-    }
-
-    /**
-     * 人脸与身份证比对（同一实现也挂在 /v1/faceIdCard/check），只传必填参数。
-     *
-     * @param name 姓名
-     * @param idCard 身份证号
-     */
-    public ApiResponse<FaceIdCardResult> faceIdCardCheck(String name, String idCard) {
-        return faceIdCardCheck(name, idCard, null, null);
+        return client.post("/v1/faceIdCard/check", request, FaceIdCardResult.class);
     }
 
     /**
@@ -105,19 +95,6 @@ public final class IdentityApi {
      */
     public ApiResponse<LivingCheckResult> livingCheck(String image1) {
         return livingCheck(image1, null, null);
-    }
-
-    /**
-     * 查询 SDK 活体检测结果。
-     *
-     * @param certifyId SDK 活体认证标识
-     * @param sdkAppId 控制台创建的 SDK AppId
-     */
-    public ApiResponse<JsonNode> livingSdkCheck(String certifyId, String sdkAppId) {
-        Params request = Params.create()
-            .put("certifyId", certifyId)
-            .put("sdkAppId", sdkAppId);
-        return client.post("/v1/living_sdk/check", request);
     }
 
 }
