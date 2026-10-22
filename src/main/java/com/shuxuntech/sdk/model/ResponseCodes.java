@@ -78,7 +78,7 @@ public final class ResponseCodes {
             case OTHER:
                 return "其他异常";
             default:
-                return "未知返回码";
+                return "未知错误";
         }
     }
 }
