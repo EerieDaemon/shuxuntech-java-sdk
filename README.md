@@ -10,7 +10,8 @@
 - 自动生成 `appKey` / `timestamp` / `sign` 请求头，按 `sha256(appKey + timestamp + appSecret)` 规则签名
 - 参数按 `application/x-www-form-urlencoded` 提交，统一解析 `code` / `msg` / `data` / `seqNo`
 - 支持 `JsonNode` 通用返回和 POJO 强类型映射（含泛型）
-- 内置 37 个接口响应模型（`com.shuxuntech.sdk.model.result`），字段与平台契约保持一致
+- 内置 34 个接口响应模型（`com.shuxuntech.sdk.model.result`），字段与平台契约保持一致
+- 内置 55 个强类型接口方法，按身份核验、运营商、银行卡、OCR、企业、交通等分类
 - 连接超时、读取超时可配置；支持注入自定义传输层（代理、链路追踪、测试替身）
 - 线程安全，全局复用一个实例即可；不自动重试，避免重复计费
 - Java 8 字节码，兼容 JDK 8 / 11 / 17 / 21
@@ -113,7 +114,7 @@ if (response.isSuccess() && Integer.valueOf(1).equals(response.getData().getResu
 }
 ```
 
-已覆盖的模型（37 个）：
+已覆盖的模型（34 个）：
 
 | 分类 | 模型 |
 | --- | --- |
@@ -139,6 +140,39 @@ ApiResponse<List<Item>> response = client.post(
 ```
 
 SDK 默认忽略响应中的未知字段，平台新增字段不会导致反序列化失败。
+
+## 强类型接口
+
+在响应模型之上，SDK 按业务分类封装了 55 个强类型方法，路径和参数与平台 Controller 保持一致：
+
+```java
+// 身份证实名核验
+ApiResponse<IdCardCheckResult> idCard =
+        client.apis().identity().idCardCheck("张三", "110101199001011234");
+
+// 银行卡三要素
+ApiResponse<Bankcard234Result> bankcard =
+        client.apis().bankcard().bankcard3Check("张三", "622202...", "110101...");
+
+// 通用文字 OCR：image 与 imgUrl 二选一
+ApiResponse<WordOcrResult> ocr =
+        client.apis().ocr().wordOcr(base64Image, null);
+```
+
+| 分类 | 入口 | 方法数 |
+| --- | --- | --- |
+| 身份核验 | `client.apis().identity()` | 5 |
+| 运营商 | `client.apis().mobile()` | 8 |
+| 银行卡 | `client.apis().bankcard()` | 7 |
+| 文字识别 | `client.apis().ocr()` | 8 |
+| 企业服务 | `client.apis().enterprise()` | 9 |
+| 交通出行 | `client.apis().vehicle()` | 11 |
+| 生活服务 | `client.apis().express()` | 2 |
+| 短信 | `client.apis().sms()` | 3 |
+| IP 归属地 | `client.apis().ip()` | 2 |
+
+接口路径与参数取自 sx-data 的 Controller，只包含带 `@Api` 注解的方法；标记为 `@Deprecated` 的控制器
+（如 `Vin2Controller`）未包含。返回结构不固定或没有内置模型的接口返回 `JsonNode`。
 
 ## 异常处理
 
@@ -259,6 +293,8 @@ shuxuntech-java-sdk
 ├── pom.xml
 ├── src/main/java/com/shuxuntech/sdk
 │   ├── ShuxunClient.java            # 入口：构建器、签名、请求、响应解析
+│   ├── ShuxunApis.java              # 强类型接口集合入口
+│   ├── api/                         # 按业务分类的强类型接口
 │   ├── auth/Signature.java          # SHA-256 签名工具
 │   ├── http/                        # 传输层抽象与 OkHttp 实现
 │   ├── model/                       # Params、ApiResponse、返回码

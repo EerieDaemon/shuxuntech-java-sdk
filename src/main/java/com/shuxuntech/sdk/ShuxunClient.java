@@ -78,6 +78,7 @@ public final class ShuxunClient implements Closeable {
     private final String appSecret;
     private final HttpTransport transport;
     private final boolean ownsTransport;
+    private final ShuxunApis apis;
 
     private ShuxunClient(Builder builder) {
         this.baseUrl = stripTrailingSlash(builder.baseUrl);
@@ -91,6 +92,7 @@ public final class ShuxunClient implements Closeable {
                     builder.connectTimeout, builder.readTimeout, builder.writeTimeout);
             this.ownsTransport = true;
         }
+        this.apis = new ShuxunApis(this);
     }
 
     /**
@@ -183,6 +185,13 @@ public final class ShuxunClient implements Closeable {
      */
     public String getBaseUrl() {
         return baseUrl;
+    }
+
+    /**
+     * 按业务分类的强类型接口集合，例如 {@code client.apis().identity().idCardCheck(...)}。
+     */
+    public ShuxunApis apis() {
+        return apis;
     }
 
     /**
