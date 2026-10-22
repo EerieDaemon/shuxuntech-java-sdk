@@ -69,6 +69,7 @@ class ShuxunClientTest {
         assertEquals(Integer.valueOf(1), response.getData().getGender());
         assertEquals("浙江省", response.getData().getProvince());
         assertEquals("seq-001", response.getSeqNo());
+        assertEquals(Integer.valueOf(200), response.getHttpStatus());
 
         RecordedRequest request = server.takeRequest(5, TimeUnit.SECONDS);
         assertNotNull(request);
@@ -111,13 +112,30 @@ class ShuxunClientTest {
     }
 
     @Test
-    void shouldThrowOnNon2xxStatus() {
-        server.enqueue(new MockResponse().setResponseCode(500).setBody("{\"error\":\"boom\"}"));
+    void shouldReturnEnvelopeEvenWhenHttpStatusIsNot2xx() {
+        server.enqueue(new MockResponse()
+                .setResponseCode(400)
+                .addHeader("Content-Type", "application/json; charset=utf-8")
+                .setBody("{\"code\":1,\"msg\":\"参数错误\",\"seqNo\":\"seq-400\"}"));
+
+        ApiResponse<JsonNode> response = client.post("/v1/idCard/check", Params.create());
+
+        assertFalse(response.isSuccess());
+        assertEquals(Integer.valueOf(1), response.getCode());
+        assertEquals("参数错误", response.getMsg());
+        assertEquals("seq-400", response.getSeqNo());
+        assertEquals(Integer.valueOf(400), response.getHttpStatus());
+    }
+
+    @Test
+    void shouldThrowWhenNon2xxBodyIsNotPlatformEnvelope() {
+        server.enqueue(new MockResponse().setResponseCode(502).setBody("<html>bad gateway</html>"));
 
         ShuxunTransportException exception = assertThrows(ShuxunTransportException.class,
                 () -> client.post("/v1/idCard/check", Params.create()));
 
-        assertEquals(500, exception.getHttpStatus());
+        assertEquals(502, exception.getHttpStatus());
+        assertTrue(exception.getResponseBody().contains("bad gateway"));
     }
 
     @Test

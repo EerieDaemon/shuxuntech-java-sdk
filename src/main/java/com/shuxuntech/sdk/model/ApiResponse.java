@@ -1,5 +1,6 @@
 package com.shuxuntech.sdk.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
@@ -18,6 +19,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  * <p>{@code code = 0} 表示成功；其余取值见 {@link ResponseCodes}。
  * 注意 {@code code = 2}（无记录）属于正常业务返回，调用方应按业务含义处理。</p>
  *
+ * <p>平台可能用非 2xx 的 HTTP 状态码返回业务错误（例如 400），此时响应体仍是本结构，
+ * SDK 会照常解析并返回，{@link #getHttpStatus()} 保存原始状态码。</p>
+ *
  * @param <T> 业务数据类型，无具体类型时可使用 {@code JsonNode}
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -27,6 +31,10 @@ public class ApiResponse<T> {
     private String msg;
     private T data;
     private String seqNo;
+
+    /** HTTP 状态码，由 SDK 填充，不参与 JSON 序列化。 */
+    @JsonIgnore
+    private Integer httpStatus;
 
     public ApiResponse() {
     }
@@ -76,6 +84,20 @@ public class ApiResponse<T> {
     }
 
     /**
+     * 本次请求的 HTTP 状态码，由 SDK 在解析响应后填充。
+     *
+     * <p>平台返回业务错误时状态码可能不是 200（例如 400、500），可据此区分
+     * 业务失败与网关层错误；手工构造的对象该字段为 {@code null}。</p>
+     */
+    public Integer getHttpStatus() {
+        return httpStatus;
+    }
+
+    public void setHttpStatus(Integer httpStatus) {
+        this.httpStatus = httpStatus;
+    }
+
+    /**
      * 是否调用成功，即 {@code code == 0}。
      */
     public boolean isSuccess() {
@@ -84,7 +106,8 @@ public class ApiResponse<T> {
 
     @Override
     public String toString() {
-        return "ApiResponse{code=" + code
+        return "ApiResponse{httpStatus=" + httpStatus
+                + ", code=" + code
                 + ", msg='" + msg + '\''
                 + ", seqNo='" + seqNo + '\''
                 + '}';

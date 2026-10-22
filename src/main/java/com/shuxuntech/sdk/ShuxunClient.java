@@ -49,6 +49,11 @@ import java.util.Map;
  * <p>SDK 不会自动重试：平台接口通常按次计费，是否重试应由业务决定。
  * 业务错误（{@code code != 0}）默认通过返回值表达，需要抛出异常时使用
  * {@code postOrThrow} 系列方法。</p>
+ *
+ * <p>平台可能用非 2xx 的 HTTP 状态码返回业务错误（例如 400），但只要响应体仍是
+ * 统一结构（含 {@code code} 字段），SDK 就会照常解析并返回，原始状态码可通过
+ * {@link ApiResponse#getHttpStatus()} 获取；只有响应体无法识别为平台响应时才会抛出
+ * {@link ShuxunTransportException}。</p>
  */
 public final class ShuxunClient implements Closeable {
 
@@ -226,24 +231,41 @@ public final class ShuxunClient implements Closeable {
 
         int status = response.getStatus();
         String body = response.getBody();
-        if (status < 200 || status >= 300) {
-            throw new ShuxunTransportException(status,
-                    "HTTP " + status + "，响应内容: " + abbreviate(body, 512));
-        }
+        boolean httpSuccess = status >= 200 && status < 300;
+
         if (body == null || body.trim().isEmpty()) {
-            throw new ShuxunTransportException(status, "响应内容为空，HTTP " + status);
+            throw new ShuxunTransportException(status, "HTTP " + status + " 响应内容为空");
         }
 
+        ApiResponse<T> result = null;
+        IOException parseError = null;
         try {
-            ApiResponse<T> result = Json.mapper().readValue(body, responseType);
-            if (result == null) {
-                throw new ShuxunTransportException(status, "响应无法解析: " + abbreviate(body, 512));
-            }
-            return result;
+            result = Json.mapper().readValue(body, responseType);
         } catch (IOException e) {
-            throw new ShuxunTransportException(status,
-                    "响应不是合法的 JSON: " + abbreviate(body, 512), e);
+            parseError = e;
         }
+
+        // 平台把业务错误也放在统一响应体里返回，HTTP 状态可能不是 2xx（例如 400/500）。
+        // 只要响应体是平台统一结构（含 code 字段），就照常返回给调用方，由 code 表达结果。
+        if (result == null || result.getCode() == null) {
+            if (!httpSuccess) {
+                throw new ShuxunTransportException(status,
+                        "HTTP " + status + "，响应不是平台统一结构: " + abbreviate(body, 512), body, parseError);
+            }
+            if (parseError != null) {
+                throw new ShuxunTransportException(status,
+                        "响应不是合法的 JSON: " + abbreviate(body, 512), body, parseError);
+            }
+            if (result == null) {
+                throw new ShuxunTransportException(status, "响应无法解析: " + abbreviate(body, 512), body);
+            }
+            // 2xx 但缺少 code 字段：仍返回，isSuccess() 为 false
+            result.setHttpStatus(status);
+            return result;
+        }
+
+        result.setHttpStatus(status);
+        return result;
     }
 
     private static <T> ApiResponse<T> checkSuccess(ApiResponse<T> response) {

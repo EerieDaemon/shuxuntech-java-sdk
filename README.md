@@ -143,22 +143,45 @@ SDK 默认忽略响应中的未知字段，平台新增字段不会导致反序�
 
 ## 异常处理
 
+平台在 HTTP 400/500 时同样会返回统一 JSON，SDK 不会因为状态码非 2xx 丢弃响应体：
+
 | 场景 | 行为 |
 | --- | --- |
-| 网络不可达、超时、HTTP 非 2xx、响应不是合法 JSON | 抛出 `ShuxunTransportException`，`getHttpStatus()` 可拿到状态码（无响应为 0） |
+| 网络不可达、连接超时 | 抛出 `ShuxunTransportException`，`getHttpStatus()` 为 0 |
+| HTTP 非 2xx，但响应体是平台统一结构（含 `code`） | 正常返回 `ApiResponse`，`getHttpStatus()` 保存真实状态码，用 `code` 判断结果 |
+| HTTP 非 2xx 且响应体不是平台结构（如网关的 HTML 错误页） | 抛出 `ShuxunTransportException`，可用 `getHttpStatus()`、`getResponseBody()` 取状态码和原始响应 |
+| HTTP 2xx 但响应不是合法 JSON | 抛出 `ShuxunTransportException`，`getResponseBody()` 为原始响应 |
 | 业务返回 `code != 0`，调用 `post` | 正常返回 `ApiResponse`，由调用方判断 `isSuccess()` |
 | 业务返回 `code != 0`，调用 `postOrThrow` | 抛出 `ShuxunApiException`，包含 `code`、`msg`、`seqNo` |
 
 ```java
+ApiResponse<IdCardCheckResult> response = client.post(
+        "/v1/idCard/check", params, IdCardCheckResult.class);
+
+if (!response.isSuccess()) {
+    // HTTP 400/500 也可能走到这里，code、msg、seqNo 依然可用
+    System.err.printf("HTTP %s, code=%d(%s), msg=%s, seqNo=%s%n",
+            response.getHttpStatus(),
+            response.getCode(),
+            ResponseCodes.describe(response.getCode()),
+            response.getMsg(),
+            response.getSeqNo());
+}
+```
+
+需要异常时改用 `postOrThrow`：
+
+```java
 try {
-    ApiResponse<IdCardResult> response =
-            client.postOrThrow("/your/api/path", params, IdCardResult.class);
+    ApiResponse<IdCardCheckResult> response =
+            client.postOrThrow("/v1/idCard/check", params, IdCardCheckResult.class);
 } catch (ShuxunApiException e) {
     // 业务错误：参数、签名、余额、频率等
     System.err.println(e.getCode() + " " + e.getMsg() + " " + e.getSeqNo());
 } catch (ShuxunTransportException e) {
-    // 网络或 HTTP 层错误，可按需重试
+    // 网络或网关层错误，可按需重试
     System.err.println(e.getHttpStatus() + " " + e.getMessage());
+    System.err.println(e.getResponseBody());
 }
 ```
 
