@@ -7,7 +7,6 @@ import com.shuxuntech.sdk.api.IdentityApi;
 import com.shuxuntech.sdk.api.IpApi;
 import com.shuxuntech.sdk.api.MobileApi;
 import com.shuxuntech.sdk.api.OcrApi;
-import com.shuxuntech.sdk.api.SmsApi;
 import com.shuxuntech.sdk.api.VehicleApi;
 import com.shuxuntech.sdk.model.ApiResponse;
 import com.shuxuntech.sdk.model.result.IdCardCheckResult;
@@ -39,7 +38,7 @@ class ApiServicesTest {
 
     private static final List<Class<?>> SERVICES = Arrays.asList(
             IdentityApi.class, MobileApi.class, BankcardApi.class, OcrApi.class,
-            EnterpriseApi.class, VehicleApi.class, ExpressApi.class, SmsApi.class, IpApi.class);
+            EnterpriseApi.class, VehicleApi.class, ExpressApi.class, IpApi.class);
 
     private MockWebServer server;
     private ShuxunClient client;
@@ -114,7 +113,6 @@ class ApiServicesTest {
         assertNotNull(client.apis().enterprise());
         assertNotNull(client.apis().vehicle());
         assertNotNull(client.apis().express());
-        assertNotNull(client.apis().sms());
         assertNotNull(client.apis().ip());
     }
 

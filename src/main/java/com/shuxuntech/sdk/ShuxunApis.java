@@ -7,7 +7,6 @@ import com.shuxuntech.sdk.api.IdentityApi;
 import com.shuxuntech.sdk.api.IpApi;
 import com.shuxuntech.sdk.api.MobileApi;
 import com.shuxuntech.sdk.api.OcrApi;
-import com.shuxuntech.sdk.api.SmsApi;
 import com.shuxuntech.sdk.api.VehicleApi;
 
 /**
@@ -27,7 +26,6 @@ public final class ShuxunApis {
     private final EnterpriseApi enterprise;
     private final VehicleApi vehicle;
     private final ExpressApi express;
-    private final SmsApi sms;
     private final IpApi ip;
 
     ShuxunApis(ShuxunClient client) {
@@ -38,7 +36,6 @@ public final class ShuxunApis {
         this.enterprise = new EnterpriseApi(client);
         this.vehicle = new VehicleApi(client);
         this.express = new ExpressApi(client);
-        this.sms = new SmsApi(client);
         this.ip = new IpApi(client);
     }
 
@@ -89,13 +86,6 @@ public final class ShuxunApis {
      */
     public ExpressApi express() {
         return express;
-    }
-
-    /**
-     * 短信接口。
-     */
-    public SmsApi sms() {
-        return sms;
     }
 
     /**

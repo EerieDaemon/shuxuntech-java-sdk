@@ -87,8 +87,7 @@ public class Demo {
             if (response.isSuccess()) {
                 System.out.println(response.getData());
             } else {
-                System.err.printf("调用失败 code=%d(%s), msg=%s, seqNo=%s%n",
-                        response.getCode(), response.getMsg(), response.getSeqNo());
+                System.err.printf("调用失败:" + response);
             }
         }
     }
@@ -168,7 +167,6 @@ ApiResponse<WordOcrResult> ocr =
 | 企业服务 | `client.apis().enterprise()` | 9 |
 | 交通出行 | `client.apis().vehicle()` | 11 |
 | 生活服务 | `client.apis().express()` | 2 |
-| 短信 | `client.apis().sms()` | 3 |
 | IP 归属地 | `client.apis().ip()` | 2 |
 
 接口路径与参数取自 sx-data 的 Controller，只包含带 `@Api` 注解的方法；标记为 `@Deprecated` 的控制器
