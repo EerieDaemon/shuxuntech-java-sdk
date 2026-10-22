@@ -6,7 +6,7 @@
 
     <groupId>com.shuxuntech</groupId>
     <artifactId>shuxuntech-java-sdk</artifactId>
-    <version>0.2.0</version>
+    <version>0.3.0</version>
     <packaging>jar</packaging>
 
     <name>shuxuntech-java-sdk</name>
@@ -33,7 +33,7 @@
         <connection>scm:git:git@github.com:EerieDaemon/shuxuntech-java-sdk.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/EerieDaemon/shuxuntech-java-sdk.git</developerConnection>
         <url>https://github.com/EerieDaemon/shuxuntech-java-sdk</url>
-        <tag>v0.2.0</tag>
+        <tag>v0.3.0</tag>
     </scm>
 
     <properties>
