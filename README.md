@@ -98,8 +98,7 @@ public class Demo {
 
 ## 强类型返回
 
-SDK 内置了各接口的响应模型（`com.shuxuntech.sdk.model.result`），字段与平台契约
-（sx-data 的 `com.shuxun.data.api.result`）一一对应，直接 `import` 即可：
+SDK 内置了各接口的响应模型（`com.shuxuntech.sdk.model.result`），字段与平台契约 一一对应，直接 `import` 即可：
 
 ```java
 import com.shuxuntech.sdk.model.result.IdCardCheckResult;
@@ -118,13 +117,13 @@ if (response.isSuccess() && Integer.valueOf(1).equals(response.getData().getResu
 
 | 分类 | 模型 |
 | --- | --- |
-| 身份核验 | `IdCardCheckResult`、`IdCardCommonResult`、`FaceIdCardResult`、`FaceCompareResult`、`LivingCheckResult`、`LivingSdkResult` |
+| 身份核验 | `IdCardCheckResult`、`IdCardCommonResult`、`FaceIdCardResult`、`FaceCompareResult`、`LivingCheckResult` |
 | 运营商 | `Mobile23Result`、`MobileEmptyResult`、`MobileEmptyResultV2`、`MobileOnlineResult`、`MobileStatusResult`、`MobileTransformResult` |
-| 银行卡 | `Bankcard234Result`、`BankcardOcrResult`、`BankPlaceResult`、`EntAcctCheckResult` |
+| 银行卡 | `Bankcard234Result`、`BankcardOcrResult`、`BankPlaceResult` |
 | OCR | `IdCardOcrResult`、`WordOcrResult`、`BusinessOcrResult`、`DrivingOcrResult`、`PlateOcrResult`、`VehicleOcrResult`、`VinOcrResult` |
 | 企业 | `Enterprise2Result`、`Enterprise3Result`、`Enterprise4Result`、`EnterpriseBaseInfoResult`、`EnterpriseContactsInfoResult`、`EnterpriseLikeResult`、`EnterpriseNameLikeResult`、`EnterpriseReportResult` |
 | 交通 | `Vin2Result`、`Vin2_1Result`、`Vin5Result`、`CarFiveResult` |
-| 其他 | `IpQueryCityResult`、`SmsSendResult` |
+| 其他 | `IpQueryCityResult` |
 
 未覆盖的接口可以自行定义 POJO，或直接使用 `JsonNode`：
 
