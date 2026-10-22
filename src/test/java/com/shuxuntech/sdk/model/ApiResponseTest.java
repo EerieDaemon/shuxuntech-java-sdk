@@ -41,4 +41,17 @@ class ApiResponseTest {
         assertEquals("无记录", ResponseCodes.describe(ResponseCodes.NO_RECORD));
         assertEquals("未知错误", ResponseCodes.describe(1234));
     }
+
+    @Test
+    void httpStatusShouldNotBeSerialized() throws Exception {
+        ApiResponse<JsonNode> response = new ApiResponse<JsonNode>();
+        response.setCode(0);
+        response.setMsg("成功");
+        response.setHttpStatus(400);
+
+        String json = Json.mapper().writeValueAsString(response);
+
+        assertFalse(json.contains("httpStatus"));
+        assertTrue(json.contains("\"code\":0"));
+    }
 }
