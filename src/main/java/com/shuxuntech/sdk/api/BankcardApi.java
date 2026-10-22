@@ -96,21 +96,6 @@ public final class BankcardApi {
     }
 
     /**
-     * 企业对公账户核验。
-     *
-     * @param acctNo 银行账号
-     * @param acctBank 开户银行
-     * @param entName 企业名称
-     */
-    public ApiResponse<JsonNode> entAcctCheck(String acctNo, String acctBank, String entName) {
-        Params request = Params.create()
-            .put("acctNo", acctNo)
-            .put("acctBank", acctBank)
-            .put("entName", entName);
-        return client.post("/v1/ent_acct/check", request);
-    }
-
-    /**
      * 企业税务状态查询。
      *
      * @param acctNo 银行账号
