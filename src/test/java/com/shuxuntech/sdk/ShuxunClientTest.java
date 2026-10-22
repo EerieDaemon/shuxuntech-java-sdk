@@ -2,11 +2,11 @@ package com.shuxuntech.sdk;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.shuxuntech.sdk.auth.Signature;
-import com.shuxuntech.sdk.example.IdCardCheckResult;
 import com.shuxuntech.sdk.exception.ShuxunApiException;
 import com.shuxuntech.sdk.exception.ShuxunTransportException;
 import com.shuxuntech.sdk.model.ApiResponse;
 import com.shuxuntech.sdk.model.Params;
+import com.shuxuntech.sdk.model.result.IdCardCheckResult;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;

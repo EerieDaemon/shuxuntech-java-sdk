@@ -29,7 +29,8 @@ bin/
 .DS_Store
 Thumbs.db
 
-# Local build cache used when ~/.m2 is not writable
+# Local tooling / build cache used when ~/.m2 is not writable
+.tools/
 .mvnrepo/
 .mvn/settings-local.xml
 .mvn/settings-verify.xml

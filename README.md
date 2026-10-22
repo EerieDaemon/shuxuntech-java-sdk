@@ -10,6 +10,7 @@
 - 自动生成 `appKey` / `timestamp` / `sign` 请求头，按 `sha256(appKey + timestamp + appSecret)` 规则签名
 - 参数按 `application/x-www-form-urlencoded` 提交，统一解析 `code` / `msg` / `data` / `seqNo`
 - 支持 `JsonNode` 通用返回和 POJO 强类型映射（含泛型）
+- 内置 37 个接口响应模型（`com.shuxuntech.sdk.model.result`），字段与平台契约保持一致
 - 连接超时、读取超时可配置；支持注入自定义传输层（代理、链路追踪、测试替身）
 - 线程安全，全局复用一个实例即可；不自动重试，避免重复计费
 - Java 8 字节码，兼容 JDK 8 / 11 / 17 / 21
@@ -97,30 +98,11 @@ public class Demo {
 
 ## 强类型返回
 
-为接口定义与文档字段一致的 POJO，即可直接拿到对象。以身份证实名核验
-`/v1/idCard/check` 为例（字段对应 sx-data 项目中的 `IdCardCheckResult`）：
+SDK 内置了各接口的响应模型（`com.shuxuntech.sdk.model.result`），字段与平台契约
+（sx-data 的 `com.shuxun.data.api.result`）一一对应，直接 `import` 即可：
 
 ```java
-public class IdCardCheckResult {
-
-    /** 1：一致；2：不一致；3：无记录（不计费） */
-    private Integer result;
-    /** 核验结果描述 */
-    private String resultDesc;
-
-    /** 生日，格式 yyyyMMdd，如 19930123 */
-    private String birthday;
-    /** 性别：1 男，0 女 */
-    private Integer gender;
-    /** 年龄 */
-    private Integer age;
-    private String province;
-    private String city;
-    private String district;
-    /** 籍贯 */
-    private String area;
-    // getter / setter 省略
-}
+import com.shuxuntech.sdk.model.result.IdCardCheckResult;
 
 ApiResponse<IdCardCheckResult> response = client.post(
         "/v1/idCard/check",
@@ -130,6 +112,24 @@ ApiResponse<IdCardCheckResult> response = client.post(
 if (response.isSuccess() && Integer.valueOf(1).equals(response.getData().getResult())) {
     // 核验一致
 }
+```
+
+已覆盖的模型（37 个）：
+
+| 分类 | 模型 |
+| --- | --- |
+| 身份核验 | `IdCardCheckResult`、`IdCardCommonResult`、`FaceIdCardResult`、`FaceCompareResult`、`LivingCheckResult`、`LivingSdkResult` |
+| 运营商 | `Mobile23Result`、`MobileEmptyResult`、`MobileEmptyResultV2`、`MobileOnlineResult`、`MobileStatusResult`、`MobileTransformResult` |
+| 银行卡 | `Bankcard234Result`、`BankcardOcrResult`、`BankPlaceResult`、`EntAcctCheckResult` |
+| OCR | `IdCardOcrResult`、`WordOcrResult`、`BusinessOcrResult`、`DrivingOcrResult`、`PlateOcrResult`、`VehicleOcrResult`、`VinOcrResult` |
+| 企业 | `Enterprise2Result`、`Enterprise3Result`、`Enterprise4Result`、`EnterpriseBaseInfoResult`、`EnterpriseContactsInfoResult`、`EnterpriseLikeResult`、`EnterpriseNameLikeResult`、`EnterpriseReportResult` |
+| 交通 | `Vin2Result`、`Vin2_1Result`、`Vin5Result`、`CarFiveResult` |
+| 其他 | `IpQueryCityResult`、`SmsSendResult` |
+
+未覆盖的接口可以自行定义 POJO，或直接使用 `JsonNode`：
+
+```java
+ApiResponse<JsonNode> response = client.post("/v1/xxx", params);
 ```
 
 泛型返回（例如 `List<Item>`）使用 Jackson 的 `TypeReference`：
@@ -263,6 +263,7 @@ shuxuntech-java-sdk
 │   ├── auth/Signature.java          # SHA-256 签名工具
 │   ├── http/                        # 传输层抽象与 OkHttp 实现
 │   ├── model/                       # Params、ApiResponse、返回码
+│   ├── model/result/                # 37 个接口响应模型
 │   ├── exception/                   # 业务异常与传输异常
 │   └── internal/Json.java           # 共享 ObjectMapper
 └── src/test/java                    # 单元测试与 MockWebServer 集成测试
