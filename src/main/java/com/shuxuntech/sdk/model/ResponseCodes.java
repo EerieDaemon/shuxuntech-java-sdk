@@ -43,7 +43,7 @@ public final class ResponseCodes {
     }
 
     /**
-     * 返回返回码的中文说明，未知返回码返回 {@code "未知返回码"}。
+     * 返回返回码的中文说明；未知返回码返回 {@code "未知错误"}。
      *
      * @param code 平台返回码
      */

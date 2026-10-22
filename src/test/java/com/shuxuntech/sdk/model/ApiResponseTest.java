@@ -39,6 +39,6 @@ class ApiResponseTest {
         assertEquals("成功", ResponseCodes.describe(ResponseCodes.SUCCESS));
         assertEquals("签名错误", ResponseCodes.describe(ResponseCodes.SIGN_ERROR));
         assertEquals("无记录", ResponseCodes.describe(ResponseCodes.NO_RECORD));
-        assertEquals("未知返回码", ResponseCodes.describe(1234));
+        assertEquals("未知错误", ResponseCodes.describe(1234));
     }
 }
