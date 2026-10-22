@@ -2,6 +2,7 @@ package com.shuxuntech.sdk;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.shuxuntech.sdk.auth.Signature;
+import com.shuxuntech.sdk.example.IdCardCheckResult;
 import com.shuxuntech.sdk.exception.ShuxunApiException;
 import com.shuxuntech.sdk.exception.ShuxunTransportException;
 import com.shuxuntech.sdk.model.ApiResponse;
@@ -49,25 +50,30 @@ class ShuxunClientTest {
     }
 
     @Test
-    void shouldPostSignedFormAndParseTypedData() throws Exception {
-        server.enqueue(jsonResponse("{\"code\":0,\"msg\":\"成功\",\"seqNo\":\"seq-001\","
-                + "\"data\":{\"name\":\"张三\",\"idCard\":\"110101199001011234\"}}"));
+    void shouldPostSignedFormAndParseIdCardCheckResult() throws Exception {
+        server.enqueue(jsonResponse("{\"code\":0,\"msg\":\"成功\",\"seqNo\":\"seq-001\",\"data\":{"
+                + "\"result\":1,\"resultDesc\":\"核验一致\",\"birthday\":\"19930123\","
+                + "\"gender\":1,\"age\":32,\"province\":\"浙江省\",\"city\":\"杭州市\","
+                + "\"district\":\"余杭区\",\"area\":\"浙江杭州\"}}"));
 
-        ApiResponse<IdCardResult> response = client.post(
-                "/v1/ocr/idcard",
+        ApiResponse<IdCardCheckResult> response = client.post(
+                "/v1/idCard/check",
                 Params.create().put("name", "张三").put("idCard", "110101199001011234"),
-                IdCardResult.class);
+                IdCardCheckResult.class);
 
         assertTrue(response.isSuccess());
         assertNotNull(response.getData());
-        assertEquals("张三", response.getData().getName());
-        assertEquals("110101199001011234", response.getData().getIdCard());
+        assertEquals(Integer.valueOf(1), response.getData().getResult());
+        assertEquals("核验一致", response.getData().getResultDesc());
+        assertEquals("19930123", response.getData().getBirthday());
+        assertEquals(Integer.valueOf(1), response.getData().getGender());
+        assertEquals("浙江省", response.getData().getProvince());
         assertEquals("seq-001", response.getSeqNo());
 
         RecordedRequest request = server.takeRequest(5, TimeUnit.SECONDS);
         assertNotNull(request);
         assertEquals("POST", request.getMethod());
-        assertEquals("/v1/ocr/idcard", request.getPath());
+        assertEquals("/v1/idCard/check", request.getPath());
         assertEquals(APP_KEY, request.getHeader("appKey"));
 
         String timestamp = request.getHeader("timestamp");
@@ -85,10 +91,10 @@ class ShuxunClientTest {
     void shouldReturnBusinessErrorWithoutThrowing() {
         server.enqueue(jsonResponse("{\"code\":2,\"msg\":\"无记录\",\"seqNo\":\"seq-002\"}"));
 
-        ApiResponse<JsonNode> response = client.post("/v1/enterprise/query", Params.create());
+        ApiResponse<JsonNode> response = client.post("/v1/idCard/check", Params.create());
 
         assertFalse(response.isSuccess());
-        assertEquals(2, response.getCode().intValue());
+        assertEquals(Integer.valueOf(2), response.getCode());
         assertEquals("无记录", response.getMsg());
     }
 
@@ -97,7 +103,7 @@ class ShuxunClientTest {
         server.enqueue(jsonResponse("{\"code\":4,\"msg\":\"签名错误\",\"seqNo\":\"seq-003\"}"));
 
         ShuxunApiException exception = assertThrows(ShuxunApiException.class,
-                () -> client.postOrThrow("/v1/test", Params.create()));
+                () -> client.postOrThrow("/v1/idCard/check", Params.create()));
 
         assertEquals(4, exception.getCode());
         assertEquals("签名错误", exception.getMsg());
@@ -109,7 +115,7 @@ class ShuxunClientTest {
         server.enqueue(new MockResponse().setResponseCode(500).setBody("{\"error\":\"boom\"}"));
 
         ShuxunTransportException exception = assertThrows(ShuxunTransportException.class,
-                () -> client.post("/v1/test", Params.create()));
+                () -> client.post("/v1/idCard/check", Params.create()));
 
         assertEquals(500, exception.getHttpStatus());
     }
@@ -119,7 +125,7 @@ class ShuxunClientTest {
         server.enqueue(new MockResponse().setResponseCode(200).setBody("<html>bad gateway</html>"));
 
         assertThrows(ShuxunTransportException.class,
-                () -> client.post("/v1/test", Params.create()));
+                () -> client.post("/v1/idCard/check", Params.create()));
     }
 
     @Test
@@ -137,30 +143,5 @@ class ShuxunClientTest {
                 .setResponseCode(200)
                 .addHeader("Content-Type", "application/json; charset=utf-8")
                 .setBody(body);
-    }
-
-    /**
-     * 强类型业务数据示例。
-     */
-    public static class IdCardResult {
-
-        private String name;
-        private String idCard;
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public String getIdCard() {
-            return idCard;
-        }
-
-        public void setIdCard(String idCard) {
-            this.idCard = idCard;
-        }
     }
 }

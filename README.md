@@ -77,7 +77,7 @@ public class Demo {
                 .build()) {
 
             ApiResponse<JsonNode> response = client.post(
-                    "/your/api/path",                       // 以官方文档中的接口地址为准
+                    "/v1/idCard/check",                     // 身份证实名核验
                     Params.create()
                             .put("name", "张三")
                             .put("idCard", "110101199001011234"));
@@ -97,21 +97,38 @@ public class Demo {
 
 ## 强类型返回
 
-为接口定义与文档字段一致的 POJO，即可直接拿到对象：
+为接口定义与文档字段一致的 POJO，即可直接拿到对象。以身份证实名核验
+`/v1/idCard/check` 为例（字段对应 sx-data 项目中的 `IdCardCheckResult`）：
 
 ```java
-public class IdCardResult {
+public class IdCardCheckResult {
 
-    private String name;
-    private String idCard;
+    /** 1：一致；2：不一致；3：无记录（不计费） */
+    private Integer result;
+    /** 核验结果描述 */
+    private String resultDesc;
+
+    /** 生日，格式 yyyyMMdd，如 19930123 */
+    private String birthday;
+    /** 性别：1 男，0 女 */
+    private Integer gender;
+    /** 年龄 */
+    private Integer age;
+    private String province;
+    private String city;
+    private String district;
+    /** 籍贯 */
+    private String area;
     // getter / setter 省略
 }
 
-ApiResponse<IdCardResult> response =
-        client.post("/your/api/path", params, IdCardResult.class);
+ApiResponse<IdCardCheckResult> response = client.post(
+        "/v1/idCard/check",
+        Params.create().put("name", "张三").put("idCard", "110101199001011234"),
+        IdCardCheckResult.class);
 
-if (response.isSuccess()) {
-    IdCardResult result = response.getData();
+if (response.isSuccess() && Integer.valueOf(1).equals(response.getData().getResult())) {
+    // 核验一致
 }
 ```
 
