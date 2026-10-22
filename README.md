@@ -40,7 +40,7 @@
     <dependency>
         <groupId>com.github.EerieDaemon</groupId>
         <artifactId>shuxuntech-java-sdk</artifactId>
-        <version>v0.1.0</version>
+        <version>v0.1.1</version>
     </dependency>
 </dependencies>
 ```
@@ -53,7 +53,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.EerieDaemon:shuxuntech-java-sdk:v0.1.0'
+    implementation 'com.github.EerieDaemon:shuxuntech-java-sdk:v0.1.1'
 }
 ```
 
@@ -278,8 +278,8 @@ mvn -Prelease package       # 额外生成 sources / javadoc jar
 发布新版本（JitPack 按 tag 构建）：
 
 ```bash
-git tag v0.1.0
-git push origin v0.1.0
+git tag v0.1.1
+git push origin v0.1.1
 ```
 
 ## 后续计划
