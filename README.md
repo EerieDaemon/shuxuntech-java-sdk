@@ -4,7 +4,7 @@
 [![JitPack](https://jitpack.io/v/EerieDaemon/shuxuntech-java-sdk.svg)](https://jitpack.io/#EerieDaemon/shuxuntech-java-sdk)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 
-数勋科技开放平台（shuxuntech）的 Java SDK，封装了平台要求的签名鉴权、表单提交、统一响应解析与异常处理，
+数勋科技开放平台（[shuxuntech.com](https://shuxuntech.com/)）的 Java SDK，封装了平台要求的签名鉴权、表单提交、统一响应解析与异常处理，
 让业务代码只关心参数和结果。
 
 - 自动生成 `appKey` / `timestamp` / `sign` 请求头，按 `sha256(appKey + timestamp + appSecret)` 规则签名
@@ -317,10 +317,26 @@ git push origin v0.3.0
 
 ## 后续计划
 
-- [ ] 按接口分类提供强类型客户端（OCR、身份核验、银行卡、企业、交通等），隐藏路径与字段细节
+- [x] 按接口分类提供强类型客户端（已完成 9 类 52 个方法）
 - [ ] 补充各接口的请求/响应模型与文档链接
 - [ ] 支持文件上传（multipart）类 OCR 接口
 - [ ] 发布到 Maven Central，进一步简化为单段 `dependency`
+
+## 关于数勋科技
+
+[杭州数勋科技有限公司](https://shuxuntech.com/) 提供企业级数据 API 服务，覆盖身份核验、运营商、银行卡、
+文字识别、企业工商、交通出行、生活服务等 8 大类 200+ 标准化接口，平均响应 200ms 以内、
+服务可用性 99.9%，支持免费试用与 7×24 小时技术支持。
+
+| 入口 | 地址 |
+| --- | --- |
+| 官网 | https://shuxuntech.com/ |
+| API 市场 | https://shuxuntech.com/product |
+| 帮助文档 | https://shuxuntech.com/help |
+| 控制台 | https://platform.shuxuntech.com/ |
+
+注册并完成企业认证后可领取免费调用额度，本 SDK 覆盖的接口在控制台开通后即可调用；
+遇到接入问题可直接联系技术支持。
 
 ## 许可证
 
